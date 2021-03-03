@@ -2,6 +2,7 @@
 namespace GDO\Docs;
 
 use GDO\Core\GDO_Module;
+use GDO\File\FileUtil;
 
 /**
  * Generate docs using phpDocumentor.
@@ -16,4 +17,9 @@ final class Module_Docs extends GDO_Module
 
     public function href_administrate_module() { return $this->href('Admin'); }
 
+    public function onInstall()
+    {
+        FileUtil::createDir($this->filePath('DOCS'));
+    }
+    
 }
