@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor configVersion="3.0">
+  <paths>
+    <output><?php echo $outputPath; ?></output>
+<!--     <cache>string</cache> -->
+  </paths>
+  <version number="6.10">
+<!--     <folder>latest</folder> -->
+    <!--Zero or more repetitions:-->
+    <api format="php">
+      <source dsn="<?php echo $sourcePath; ?>">
+        <path>.</path>
+      </source>
+<!--       <output>api</output> -->
+      <ignore hidden="true" symlinks="true">
+<?php foreach ($ignore as $path) : ?>
+        <path><?php echo $path; ?></path>
+<?php endforeach; ?>
+      </ignore>
+      <extensions>
+        <extension>php</extension>
+      </extensions>
+<!--       <visibility>private</visibility> -->
+      <default-package-name>gdo6</default-package-name>
+      <include-source>true</include-source>
+      <markers>
+        <marker>XXX</marker>
+        <marker>TODO</marker>
+        <marker>FIXME</marker>
+      </markers>
+    </api>
+<!--     <guide format="rst"> -->
+<!--       <source dsn="."> -->
+<!--         <path>support/docs</path> -->
+<!--       </source> -->
+<!--       <output>docs</output> -->
+<!--     </guide> -->
+  </version>
+<!--   <setting name="string" value="string"/> -->
+<!--   <template name="string" location="string"> -->
+<!--     <parameter name="string" value="string"/> -->
+<!--   </template> -->
+</phpdocumentor>
