@@ -14,10 +14,13 @@ use GDO\Core\GDT_Module;
 use GDO\Core\GDO_Module;
 use GDO\Install\Installer;
 use GDO\DB\GDT_Enum;
+use GDO\DB\GDT_Checkbox;
 
 /**
- * Admin page for Docs module.
+ * Config generator for phpDocumentor.
  * @author gizmore
+ * @version 6.10.1
+ * @since 6.10.0
  */
 final class Generate extends MethodForm
 {
@@ -40,18 +43,21 @@ final class Generate extends MethodForm
     {
         $form->addFields([
             GDT_Enum::make('visibility')->enumValues('private', 'protected', 'public')->initial('public'),
-            GDT_Module::make('module')->emptyInitial('select_entry', ''),
+            GDT_Module::make('module')->emptyInitial('select_all_modules', ''),
+            GDT_Checkbox::make('include_core')->initial('1'),
+            GDT_Checkbox::make('include_dependencies')->initial('1'),
             GDT_AntiCSRF::make(),
         ]);
-        $form->actions()->addFields([
-            GDT_Submit::make(),
-        ]);
+        $form->actions()->addField(GDT_Submit::make());
     }
     
     /**
      * @return GDO_Module
      */
     public function getSingleModule() { return $this->getForm()->getFormValue('module'); }
+    
+    public function includeCore() { return $this->getForm()->getParameterValue('include_core'); }
+    public function includeDeps() { return $this->getForm()->getParameterValue('include_dependencies'); }
     
     public function formValidated(GDT_Form $form)
     {
@@ -77,26 +83,50 @@ final class Generate extends MethodForm
         # Ignore list hook
         GDT_Hook::callHook('IgnoreDocsFiles', $ignore);
         
-        if ($singleModule = $this->getSingleModule()) {
-            $all = Installer::getDependencyModules($singleModule->getName());
-            $pathes->data[] = 'GDO6.php';
-            $pathes->data[] = 'DOCS';
-            $pathes->data[] = 'install';
-            $pathes->data[] = 'gdo.php';
-            $pathes->data[] = 'index.php';
-            $pathes->data[] = 'GDO/Classic';
-            $pathes->data[] = 'GDO/Date';
-            $pathes->data[] = 'GDO/DB';
-            $pathes->data[] = 'GDO/File';
-            $pathes->data[] = 'GDO/Form';
-            $pathes->data[] = 'GDO/Install';
-            $pathes->data[] = 'GDO/Mail';
-            $pathes->data[] = 'GDO/Net';
-            $pathes->data[] = 'GDO/UI';
-            $pathes->data[] = 'GDO/Util';
-        } else {
+        # Single module mode
+        if ($singleModule = $this->getSingleModule())
+        {
+            if ($this->includeDeps())
+            {
+                # Single module and all it's dependencies.
+                $all = Installer::getDependencyModules($singleModule->getName());
+            }
+            else
+            {
+                $all = [];
+                if ($this->includeCore())
+                {
+                    $core = $this->getSingleModule()->gdoDependencies();
+                    $core = array_map(function($moduleName){
+                        return ModuleLoader::instance()->getModule($moduleName);}, $core);
+                    $all = $core;
+                }
+                $all[] = $singleModule;
+            }
+
+            if ($this->includeCore())
+            {
+                $pathes->data[] = 'GDO6.php';
+                $pathes->data[] = 'DOCS';
+                $pathes->data[] = 'install';
+                $pathes->data[] = 'gdo.php';
+                $pathes->data[] = 'index.php';
+                $pathes->data[] = 'GDO/Classic';
+                $pathes->data[] = 'GDO/Date';
+                $pathes->data[] = 'GDO/DB';
+                $pathes->data[] = 'GDO/File';
+                $pathes->data[] = 'GDO/Form';
+                $pathes->data[] = 'GDO/Install';
+                $pathes->data[] = 'GDO/Mail';
+                $pathes->data[] = 'GDO/Net';
+                $pathes->data[] = 'GDO/UI';
+                $pathes->data[] = 'GDO/Util';
+            }
+        }
+        else # All modules
+        {
             $all = ModuleLoader::instance()->loadModules(false, true);
-            $pathes->data[] = '.';
+            $pathes->data[] = '.'; # Whole thing
         }
         
         # Ignore disabled modules
