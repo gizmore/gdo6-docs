@@ -21,6 +21,7 @@
       </ignore>
       <extensions>
         <extension>php</extension>
+        <extension>md</extension>
       </extensions>
       <visibility><?php echo $visibility; ?></visibility>
       <default-package-name>gdo6</default-package-name>
