@@ -39,7 +39,7 @@
 <!--       <output>docs</output> -->
 <!--     </guide> -->
   </version>
-  <template name="responsive-twig" location="data/templates/responsive-twig/template.xml">
+<!--   <template name="responsive-twig" location="data/templates/responsive-twig/template.xml"> -->
 <!--     <parameter name="string" value="string"/> -->
-  </template>
+<!--   </template> -->
 </phpdocumentor>
