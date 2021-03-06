@@ -1,3 +1,5 @@
 /DOCS/
 /.phpdoc/
 /config.xml
+
+.DOCS_CACHE

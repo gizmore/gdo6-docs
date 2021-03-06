@@ -2,14 +2,16 @@
 <phpdocumentor configVersion="3.0">
   <paths>
     <output><?php echo $outputPath; ?></output>
-<!--     <cache>string</cache> -->
+    <cache><?php echo $cachePath; ?></cache>
   </paths>
   <version number="6.10">
 <!--     <folder>latest</folder> -->
     <!--Zero or more repetitions:-->
     <api format="php">
-      <source dsn="<?php echo $sourcePath; ?>">
-        <path>.</path>
+      <source dsn="<?=$sourcePath?>">
+<?php foreach ($pathes as $path) : ?>
+        <path><?=$path?></path>
+<?php endforeach; ?>
       </source>
 <!--       <output>api</output> -->
       <ignore hidden="true" symlinks="true">
@@ -20,7 +22,7 @@
       <extensions>
         <extension>php</extension>
       </extensions>
-<!--       <visibility>private</visibility> -->
+      <visibility><?php echo $visibility; ?></visibility>
       <default-package-name>gdo6</default-package-name>
       <include-source>true</include-source>
       <markers>
@@ -36,8 +38,7 @@
 <!--       <output>docs</output> -->
 <!--     </guide> -->
   </version>
-<!--   <setting name="string" value="string"/> -->
-<!--   <template name="string" location="string"> -->
+  <template name="responsive-twig" location="data/templates/responsive-twig/template.xml">
 <!--     <parameter name="string" value="string"/> -->
-<!--   </template> -->
+  </template>
 </phpdocumentor>
