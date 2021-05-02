@@ -79,6 +79,7 @@ final class Generate extends MethodForm
         $ignore->data[] = 'vendor/**/*';
         $ignore->data[] = 'temp/**/*';
         $ignore->data[] = 'files/**/*';
+        $ignore->data[] = 'files_test/**/*';
         
         # Ignore list hook
         GDT_Hook::callHook('IgnoreDocsFiles', $ignore);
