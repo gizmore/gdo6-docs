@@ -10,18 +10,21 @@ use GDO\UI\GDT_Link;
 /**
  * Generate docs using phpDocumentor.
  * Show generated docs website.
- * @XXX The first and only module that needs gdo_post_install.sh
+ * 
+ * Currently you can generate the config via gdo6 and afterwards run a cli command.
+ * 
+ * @TODO make a bin/generate.sh
  * 
  * @author gizmore
- * @version 6.10
- * @since 6.10
+ * @version 6.10.2
+ * @since 6.10.0
  */
 final class Module_Docs extends GDO_Module
 {
     ##############
     ### Module ###
     ##############
-    public $module_priority = 95;
+    public $module_priority = 200;
     
     public function href_administrate_module() { return $this->href('Admin'); }
     public function onLoadLanguage() { return $this->loadLanguage('lang/docs'); }
@@ -41,9 +44,11 @@ final class Module_Docs extends GDO_Module
     {
         return [
             GDT_Checkbox::make('bottom_bar')->initial('1'),
+            GDT_Checkbox::make('ignore_disabled_modules')->initial('0'),
         ];
     }
     public function cfgBottomBar() { return $this->getConfigValue('bottom_bar'); }
+    public function cfgIgnoreDisabledModules() { return $this->getConfigValue('ignore_disabled_modules'); }
 
     #############
     ### Hooks ###

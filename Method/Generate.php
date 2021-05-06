@@ -15,11 +15,13 @@ use GDO\Core\GDO_Module;
 use GDO\Install\Installer;
 use GDO\DB\GDT_Enum;
 use GDO\DB\GDT_Checkbox;
+use GDO\Docs\Module_Docs;
 
 /**
  * Config generator for phpDocumentor.
+ * 
  * @author gizmore
- * @version 6.10.1
+ * @version 6.10.2
  * @since 6.10.0
  */
 final class Generate extends MethodForm
@@ -87,6 +89,13 @@ final class Generate extends MethodForm
         # Single module mode
         if ($singleModule = $this->getSingleModule())
         {
+            if ($this->includeCore())
+            {
+                $core = $this->getSingleModule()->gdoDependencies();
+                $core = array_map(function($moduleName){
+                    return ModuleLoader::instance()->getModule($moduleName);}, $core);
+            }
+                
             if ($this->includeDeps())
             {
                 # Single module and all it's dependencies.
@@ -97,9 +106,6 @@ final class Generate extends MethodForm
                 $all = [];
                 if ($this->includeCore())
                 {
-                    $core = $this->getSingleModule()->gdoDependencies();
-                    $core = array_map(function($moduleName){
-                        return ModuleLoader::instance()->getModule($moduleName);}, $core);
                     $all = $core;
                 }
                 $all[] = $singleModule;
@@ -107,39 +113,38 @@ final class Generate extends MethodForm
 
             if ($this->includeCore())
             {
-                $pathes->data[] = 'GDO6.php';
-                $pathes->data[] = 'DOCS';
-                $pathes->data[] = 'install';
+                $pathes->data[] = 'DOCS'; # DOCS in md of the gdo6 core 
                 $pathes->data[] = 'gdo.php';
+                $pathes->data[] = 'GDO6.php';
                 $pathes->data[] = 'index.php';
-                $pathes->data[] = 'GDO/Classic';
-                $pathes->data[] = 'GDO/Date';
-                $pathes->data[] = 'GDO/DB';
-                $pathes->data[] = 'GDO/File';
-                $pathes->data[] = 'GDO/Form';
-                $pathes->data[] = 'GDO/Install';
-                $pathes->data[] = 'GDO/Mail';
-                $pathes->data[] = 'GDO/Net';
-                $pathes->data[] = 'GDO/UI';
-                $pathes->data[] = 'GDO/Util';
+                $pathes->data[] = 'install';
+                foreach ($core as $path)
+                {
+                    $pathes->data[] = $path;
+                }
             }
         }
         else # All modules
         {
             $all = ModuleLoader::instance()->loadModules(false, true);
-            $pathes->data[] = '.'; # Whole thing
+            $pathes->data[] = '.*';
+            $pathes->data[] = 'install/*';
+            $pathes->data[] = 'install/**/*';
+            $pathes->data[] = 'GDO/**/*';
+            $pathes->data[] = 'DOCS/*';
         }
         
         # Ignore disabled modules
+        $ignoring = Module_Docs::instance()->cfgIgnoreDisabledModules();
         foreach ($all as $module)
         {
-            if (!$module->isEnabled())
-            {
-                $ignore->data[] = 'GDO/' . $module->getName() . '/**/*';
-            }
             if ($singleModule)
             {
                 $pathes->data[] = 'GDO/' . $module->getName();
+            }
+            elseif ($ignoring && !$module->isEnabled())
+            {
+                $ignore->data[] = 'GDO/' . $module->getName();
             }
         }
 
@@ -180,6 +185,7 @@ final class Generate extends MethodForm
     {
         # @TODO create a gdo6-proc module that handles async requests from website to proc with progress bar.
         # @TODO actually launch the generator
+        # Use the following command to run the generation via CLI.
         # $path = php phpDocumentor.phar -c config.xml
         set_time_limit(60*60); # 1h
     }
